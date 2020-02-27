@@ -7,7 +7,9 @@ import numpy as np
 
 class Calibration:
     def __init__(self):
-        self.images = glob.glob('chessboard_img/*.jpg')
+        # self.camera_type = 'C922'
+        self.camera_type = 'C930E'
+        self.images = glob.glob('{}_image/*.jpg'.format(self.camera_type))
 
         # size chessboard
         self.num_wblock  = 8
@@ -25,7 +27,7 @@ class Calibration:
         self.img_points  = [] # 2d points in image plane.
 
         self.img_size     = None
-        self.camera_dist  = "data/camera_dist.p"
+        self.camera_dist  = "data/{}_dist.p".format(self.camera_type)
 
     def read_chessboards(self):
         for image in self.images:
@@ -51,12 +53,14 @@ class Calibration:
         cv2.destroyAllWindows()
 
     def calibrate_camera(self):
+        print('Please wait, calibration process ... ')
         ret, self.mtx, self.dist, rvecs, tvecs = cv2.calibrateCamera(self.obj_points, self.img_points, self.img_size, None, None)
         print('Error calibration: {}'.format(ret))
 
         # dunp pickle
         calib_dict = {'mtx': self.mtx, 'dist': self.dist, 'img_size':self.img_size}
-        
+        print('Image size: {}'.format(self.img_size) )
+
         with open(self.camera_dist, "wb") as f:
             pickle.dump(calib_dict, f)
             print('Successful dump: {}'.format(self.camera_dist))
@@ -69,9 +73,10 @@ class Calibration:
         self.mtx      = dist_pickle["mtx"]
         self.dist     = dist_pickle["dist"]
         self.img_size = dist_pickle["img_size"]
+        print('Image size: {}'.format(self.img_size) )
 
     def undistort_test(self):
-        camera   = cv2.VideoCapture(1)
+        camera   = cv2.VideoCapture("/dev/{}".format(self.camera_type))
         camera.set(3, self.img_size[0]) # 1024
         camera.set(4, self.img_size[1]) # 576
         _, img = camera.read()
@@ -88,6 +93,7 @@ class Calibration:
             # crop undistorted field
             x, y, w, h = roi
             undist_img = undist_img[y:y+h, x:x+w]
+            # print(undist_img.shape)
 
             # show frame
             cv2.imshow("original", img)
@@ -105,7 +111,6 @@ class Calibration:
         if self.calibration:
             self.read_chessboards()  # 1st step
             self.calibrate_camera()  # 2nd step
-
         else:
             self.load_calibrate()
         

@@ -4,7 +4,10 @@ import os
 import cv2
 
 # parameter
-path  = "new_path/" # "chessboard_img/"
+camera_type = 'C922'
+#camera_type = 'C930E'
+
+path  = "{}_image/".format(camera_type)
 if not os.path.exists(path):
     os.mkdir(path)
 
@@ -23,11 +26,10 @@ cv2.namedWindow("img")
 cv2.setMouseCallback("img", mouse_event)
 
 # video capture
-camera   = cv2.VideoCapture(1)
+camera   = cv2.VideoCapture('/dev/C930E')
 camera.set(3, 1024)
 camera.set(4, 576) 
 ret, img = camera.read()
-
 
 while True:
     name = path + str(img_count)+".jpg"

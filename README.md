@@ -25,7 +25,7 @@ Tested on MSI-GP63 (Leopard 8RE):
 3. Memory 16GB DDR4 2666MHz
 4. SSD 256 GB
 5. Ubuntu 16.04.06 LTS (with ROS Kinetic)
-6. Logitech C922 webcam
+6. Logitech C922 / C930E webcam
 
 
 ---
